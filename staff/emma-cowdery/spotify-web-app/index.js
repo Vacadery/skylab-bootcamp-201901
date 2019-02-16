@@ -153,26 +153,6 @@ app.get('/home', (req, res) => {
     }
 })
 
-// app.post('/home/search', formBodyParser, (req, res) => {
-//     const { body: { query } } = req
-
-//     const logic = logicFactory.create(req)
-
-//     try {
-//         logic.searchArtists(query)
-//             .then(() => res.redirect('/home/search/'))
-//             .catch((message) => {
-//                 req.session.feedback = message
-
-//                 res.redirect('/home')
-//             })
-//     } catch ({ message }) {
-//         req.session.feedback = message
-
-//         res.redirect('/home')
-//     }
-// })
-
 app.post('/home/search', formBodyParser, (req, res) => {
     const { body: { query } } = req
 
