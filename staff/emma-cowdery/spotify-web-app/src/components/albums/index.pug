@@ -1,0 +1,11 @@
+extends ../layout
+
+include ../feedback/index
+
+block content
+    section.albums
+      h2 Albums
+      ul
+        each album in items
+          li
+            a(href=`/album&${album.id}`) #{album.name}

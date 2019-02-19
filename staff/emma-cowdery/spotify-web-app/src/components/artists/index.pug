@@ -1,0 +1,11 @@
+extends ../layout
+
+include ../feedback/index
+
+block content
+    section.artists
+      h2 Artists
+      ul
+        each artist in items
+          li
+            a(href=`/artist&${artist.id}`) #{artist.name}

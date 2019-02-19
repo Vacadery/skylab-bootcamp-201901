@@ -37,11 +37,10 @@ function pullFeedback(req) {
 function renderPage(content) {
     return `<html>
 <head>
-    <title>HELLO WORLD!</title>
+    <title>spotify</title>
     <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body class="main">
-    <h1>HELLO WORLD! 🤡</h1>
     ${content}
 </body>
 </html>`
@@ -135,7 +134,7 @@ app.get('/home', (req, res) => {
         <form action="/logout" method="post">
             <button type="submit">Logout</button>
         </form>
-        <form action='/home/search' method="post">
+        <form action='/search' method="post">
             <input type="search" name="query" placegolder="search"/>
             <button type="submit">Search</button>
         </form>
@@ -153,11 +152,11 @@ app.get('/home', (req, res) => {
     }
 })
 
-app.post('/home/search', formBodyParser, (req, res) => {
+app.post('/search', formBodyParser, (req, res) => {
     const { body: { query } } = req
 
     try {
-        res.redirect(`/home/search/${query}`)
+        res.redirect(`/search&${query}`)
     } catch ({ message }) {
         req.session.feedback = message
 
@@ -165,21 +164,20 @@ app.post('/home/search', formBodyParser, (req, res) => {
     }
 })
 
-app.get('/home/search/:query', (req, res) => {
+app.get('/search&:query', (req, res) => {
     const { params: { query } } = req
 
     const logic = logicFactory.create(req)
 
     try {
-        logic.searchArtists(query)
+        if (logic.isUserLoggedIn) {
+            logic.searchArtists(query)
             .then((items) => {
-                res.send(renderPage(`<section>
-                <h2>Artists</h2>
-                <ul>
-                    ${items && items.map(({name, id})=> `<li><a href="/artist/${id}">${name}</a></li>`)}
-                </ul>
-                </section>`))
+                const feedback = pullFeedback(req)
+                res.render('artists', { feedback, items })
             })
+        } else res.redirect('/login')
+        
     } catch ({ message }) {
         req.session.feedback = message
 
@@ -187,21 +185,74 @@ app.get('/home/search/:query', (req, res) => {
     }
 })
 
-app.get('/artist/:id', formBodyParser, (req, res) => {
-    const { params: { id } } = req
+app.get('/artist&:artistId', formBodyParser, (req, res) => {
+    const { params: { artistId } } = req
 
     const logic = logicFactory.create(req)
 
     try {
-        logic.retrieveAlbums(id)
+        if (logic.isUserLoggedIn) {
+            logic.retrieveAlbums(artistId)
             .then((items) => {
-                res.send(renderPage(`<section>
-                <h2>Albums</h2>
-                <ul>
-                    ${items && items.map(({name, id})=> `<li><a href="/artist/${name/id}">${name}</a></li>`)}
-                </ul>
-                </section>`))
+                const feedback = pullFeedback(req)
+                res.render('albums', { feedback, items })
             })
+        } else res.redirect('/login')
+
+    } catch ({ message }) {
+        req.session.feedback = message
+
+        res.redirect('/home')
+    }
+})
+
+app.get('/album&:albumId', formBodyParser, (req, res) => {
+    const { params: { albumId } } = req
+
+    req.session.albumId = albumId
+
+    const logic = logicFactory.create(req)
+
+    var play = false
+
+    try {
+        if (logic.isUserLoggedIn) {
+            logic.retrieveTracks(albumId)
+            .then((items) => {
+                const feedback = pullFeedback(req)
+                res.render('tracks', { feedback, items, albumId, play })
+            })
+            .catch ((error) => {debugger})
+        } else res.redirect('/login')
+        
+    } catch ({ message }) {
+        req.session.feedback = message
+
+        res.redirect('/home')
+    }
+})
+
+app.get('/track&:trackId', formBodyParser, (req, res) => {
+    const { params: { trackId }, session: { albumId } } = req
+
+    const logic = logicFactory.create(req)
+
+    try {
+        if (logic.isUserLoggedIn) {
+
+            logic.retrieveTracks(albumId)
+            .then((items) => {
+                const feedback = pullFeedback(req)
+                res.render('tracks2', { feedback, items, albumId })
+            })
+            .catch ((error) => {debugger})
+
+            logic.retrieveTrack(trackId)
+            .then((item) => {
+                res.render('track', { item })
+            })
+        } else res.redirect('/login')
+        
     } catch ({ message }) {
         req.session.feedback = message
 

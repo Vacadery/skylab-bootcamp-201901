@@ -1,0 +1,17 @@
+extends ../layout
+
+include ../feedback/index
+
+block content
+    section.tracks2
+      h2 Tracks
+      ul
+        each track in items
+          li 
+            | #{track.name} 
+            a(href=`/track&${track.id}`) play
+            //- form(method='POST', action=`/album&${albumId}&${track.id}`)
+            //-   button(type="submit" onClick=`${var play = true}`) 
+            //-     div.i.fas.fa-play
+      footer
+          block footer

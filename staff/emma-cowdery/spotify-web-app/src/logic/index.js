@@ -125,6 +125,27 @@ class Logic {
         return spotifyApi.retrieveAlbums(artistId)
     }
 
+        /**
+     * Retrieves tracks from album.
+     * 
+     * @param {string} albumId 
+     */
+    retrieveTracks(albumId) {
+        if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
+
+        if (!albumId.trim().length) throw Error('albumId is empty')
+
+        return spotifyApi.retrieveTracks(albumId)
+    }
+
+    retrieveTrack(trackId) {
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
+
+        if (!trackId.trim().length) throw Error('trackId is empty')
+
+        return spotifyApi.retrieveTrack(trackId)
+    }
+
     // TODO updateUser and removeUser
 }
 
