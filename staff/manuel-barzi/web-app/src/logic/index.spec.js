@@ -1,14 +1,15 @@
 'use strict'
 const { expect } = require('chai')
-const logic = require('.')
+const Logic = require('.')
 
-describe('logic', () => {
+describe('Logic', () => {
     describe('register user', () => {
         const name = 'Manuel'
         const surname = 'Barzi'
         const email = `manuelbarzi@mail.com-${Math.random()}`
         const password = '123'
         const passwordConfirm = password
+        const logic = new Logic
 
         it('should succeed on valid data', () =>
             logic.registerUser(name, surname, email, password, passwordConfirm)
@@ -156,6 +157,7 @@ describe('logic', () => {
         const email = `manuelbarzi@mail.com-${Math.random()}`
         const password = '123'
         const passwordConfirm = password
+        const logic = new Logic
 
         beforeEach(() =>
             logic.registerUser(name, surname, email, password, passwordConfirm)
@@ -164,8 +166,8 @@ describe('logic', () => {
         it('should succeed on correct credentials', () =>
             logic.logInUser(email, password)
                 .then(() => {
-                    expect(logic.__userId__).to.exist
-                    expect(logic.__userApiToken__).to.exist
+                    expect(logic.__storage__.userId).to.exist
+                    expect(logic.__storage__.userApiToken).to.exist
                 })
         )
     })
@@ -176,6 +178,7 @@ describe('logic', () => {
         const email = `manuelbarzi@mail.com-${Math.random()}`
         const password = '123'
         const passwordConfirm = password
+        const logic = new Logic
 
         beforeEach(() =>
             logic.registerUser(name, surname, email, password, passwordConfirm)
@@ -193,6 +196,7 @@ describe('logic', () => {
         const email = `manuelbarzi@mail.com-${Math.random()}`
         const password = '123'
         const passwordConfirm = password
+        const logic = new Logic
 
         beforeEach(() =>
             logic.registerUser(name, surname, email, password, passwordConfirm)
@@ -202,8 +206,8 @@ describe('logic', () => {
         it('should succeed on correct credentials', () => {
             logic.logOutUser()
 
-            expect(logic.__userId__).to.be.null
-            expect(logic.__userId__).to.be.null
+            expect(logic.__storage__.userId).to.be.null
+            expect(logic.__storage__.userId).to.be.null
         })
     })
 
@@ -213,6 +217,7 @@ describe('logic', () => {
         const email = `manuelbarzi@mail.com-${Math.random()}`
         const password = '123'
         const passwordConfirm = password
+        const logic = new Logic
 
         beforeEach(() =>
             logic.registerUser(name, surname, email, password, passwordConfirm)
@@ -222,7 +227,7 @@ describe('logic', () => {
         it('should succeed on correct credentials', () =>
             logic.retrieveUser()
                 .then(user => {
-                    expect(user.id).to.equal(logic.__userId__)
+                    expect(user.id).to.equal(logic.__storage__.userId)
                     expect(user.name).to.equal(name)
                     expect(user.surname).to.equal(surname)
                     expect(user.email).to.equal(email)

@@ -5,7 +5,13 @@ const userApi = require('../user-api')
 /**
  * Abstraction of business logic.
  */
-const logic = {
+class Logic {
+    constructor(storage = {}) {
+        if (typeof storage !== 'object') throw Error(`${storage} is not an Object`)
+
+        this.__storage__ = storage
+    }
+
     /**
     * Registers a user.
     * 
@@ -40,7 +46,7 @@ const logic = {
 
         return userApi.register(name, surname, email, password)
             .then(() => { })
-    },
+    }
 
     /**
      * Logs in the user by its credentials.
@@ -58,25 +64,29 @@ const logic = {
         if (!password.trim().length) throw Error('password cannot be empty')
 
         return userApi.authenticate(email, password)
-    },
+            .then(({ id, token }) => {
+                this.__storage__.userId = id
+                this.__storage__.userApiToken = token
+            })
+    }
 
     /**
      * Checks user is logged in.
      */
     get isUserLoggedIn() {
-        return !!this.__userId__
-    },
+        return !!this.__storage__.userId
+    }
 
     /**
      * Logs out the user.
      */
     logOutUser() {
-        this.__userId__ = null
-        this.__userApiToken__ = null
-    },
+        this.__storage__.userId = null
+        this.__storage__.userApiToken = null
+    }
 
-    retrieveUser(userId, token) {
-        return userApi.retrieve(userId, token)
+    retrieveUser() {
+        return userApi.retrieve(this.__storage__.userId, this.__storage__.userApiToken)
             .then(({ id, name, surname, username: email, favoriteArtists = [], favoriteAlbums = [], favoriteTracks = [] }) => ({
                 id,
                 name,
@@ -86,9 +96,9 @@ const logic = {
                 favoriteAlbums,
                 favoriteTracks
             }))
-    },
+    }
 
     // TODO updateUser and removeUser
 }
 
-module.exports = logic
+module.exports = Logic
