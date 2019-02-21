@@ -7,9 +7,9 @@
     "start": "node src",
     "watch": "nodemon src",
     "debug": "node debug src",
-    "test": "mocha src/**/*.spec.js",
-    "test-debug": "mocha debug src/**/*.spec.js",
-    "test-coverage": "nyc --reporter=html --reporter=text mocha src/**/*.spec.js"
+    "test": "mocha src/**/**/*.spec.js",
+    "test-debug": "mocha debug src/**/**/*.spec.js",
+    "test-coverage": "nyc --reporter=html --reporter=text mocha src/**/**/*.spec.js"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +19,8 @@
     "dotenv": "^6.2.0",
     "es6-promise": "^4.2.6",
     "express": "^4.16.4",
-    "isomorphic-fetch": "^2.2.1"
+    "isomorphic-fetch": "^2.2.1",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "expect": "^24.1.0"

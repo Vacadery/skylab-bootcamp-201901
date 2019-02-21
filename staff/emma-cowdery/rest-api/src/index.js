@@ -21,6 +21,6 @@ app.get('/retrieve/:userId', retrieve.get)
 
 // app.get('*', notFound.get)
 
-app.get('/search-artists/:query', searchArtists.get)
+app.get('/search-artists', searchArtists.get)
 
 app.listen(port, () => console.log(`server running on port ${port}`))

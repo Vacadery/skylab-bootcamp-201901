@@ -1,10 +1,10 @@
 const logic = require('../../logic')
 
 module.exports = (req, res) => {
-    const { params: { query } } = req
+    const { query: { q } } = req
 
     try {
-        logic.searchArtists(query)
+        logic.searchArtists(q)
         .then(res.json.bind(res))
             .catch(({ message }) => {
                 res.status(401).json({
