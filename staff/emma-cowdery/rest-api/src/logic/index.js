@@ -210,6 +210,42 @@ const logic = {
 
                 return userApi.update(userId, token, { favoriteTracks })
             })
+    },
+
+    addCommentToArtist(userId, token, artistId, text) {
+        if (typeof userId !== 'string') throw Error(`${userId} is not a string`)
+
+        if (!userId.trim().length) throw Error('userId is empty')
+
+        if (typeof token !== 'string') throw Error(`${token} is not a string`)
+
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        if (typeof text !== 'string') throw Error(`${text} is not a string`)
+
+        if (!text.trim().length) throw Error('text is empty')
+
+        const comment = {
+            userId,
+            artistId,
+            text
+        }
+
+        return userApi.retrieve(userId, token)
+            .then(() => artistComment.add(comment))
+            .then(() => comment.id)
+    },
+
+    listCommentsFromArtist(artistId) {
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        return artistComment.find({ artistId })
     }
 }
 

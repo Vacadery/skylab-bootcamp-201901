@@ -17,5 +17,13 @@ module.exports = {
 
     searchArtists: {
         get: require('./search-artists/get')
+    },
+
+    addCommentToArtist: {
+        post: require('./add-comment-to-artist/post')
+    },
+
+    listCommentsFromArtist: {
+        get: require('./list-comment-from-artist/get')
     }
 }
