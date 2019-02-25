@@ -1,29 +1,17 @@
 module.exports = {
-    register: {
-        post: require('./register/post')
-    },
+    registerUser: require('./register-user'),
 
-    authenticate: {
-        post: require('./authenticate/post')
-    },
+    authenticateUser: require('./authenticate-user'),
 
-    retrieve: {
-        get: require('./retrieve/get')
-    },
+    retrieveUser: require('./retrieve-user'),
 
-    // notFound: {
-    //     get: require('./not-found/get')
-    // }
+    searchArtists: require('./search-artists'),
 
-    searchArtists: {
-        get: require('./search-artists/get')
-    },
+    addCommentToArtist: require('./add-comment-to-artist'),
 
-    addCommentToArtist: {
-        post: require('./add-comment-to-artist/post')
-    },
+    listCommentsFromArtist: require('./list-comments-from-artist'),
 
-    listCommentsFromArtist: {
-        get: require('./list-comment-from-artist/get')
-    }
+    // TODO other route handlers
+
+    notFound: require('./not-found')
 }

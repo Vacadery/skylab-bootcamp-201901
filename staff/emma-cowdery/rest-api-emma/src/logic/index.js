@@ -2,12 +2,6 @@
 
 const spotifyApi = require('../spotify-api')
 const userApi = require('../user-api')
-const users = require('../data/users')
-const artistComments = require('../data/artist-comments')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
-
-const { env: {  SECRET } } = process
 
 /**
  * Abstraction of business logic.
@@ -45,7 +39,7 @@ const logic = {
 
         if (password !== passwordConfirmation) throw Error('passwords do not match')
 
-        return users.add({ name, surname, email, password })
+        return userApi.register(name, surname, email, password)
     },
 
     /**
@@ -55,6 +49,7 @@ const logic = {
      * @param {string} password 
      */
     authenticateUser(email, password) {
+        debugger
         if (typeof email !== 'string') throw TypeError(email + ' is not a string')
 
         if (!email.trim().length) throw Error('email cannot be empty')
@@ -63,97 +58,23 @@ const logic = {
 
         if (!password.trim().length) throw Error('password cannot be empty')
 
-        // return userApi.authenticate(email, password)
-        // TODO redo authenticate here, using users driver to find user by email, verify password, generate token using jsonwebtoken
-        return users.findByEmail(email)
-            .then(user => {
-                if (!user) throw Error(`user with email ${email} not found`)
-
-                return bcrypt.compare(password, user.password)
-                    .then(match => {
-                        debugger
-                        if (!match) throw Error ('wrong credentials')
-
-                        const { id } = user
-
-                        const token = jwt.sign({data: user._id}, this.SECRET, {expiresIn: '144h'})
-
-                        return { id, token }
-                    })
-            })
-            .catch((error) => error.message)
+        return userApi.authenticate(email, password)
     },
 
-    retrieveUser(id, token) {
-        if (typeof id !== 'string') throw TypeError(id + ' is not an string')
-
-        if (!id.trim().length) throw Error ('id is empty')
-
-        if (typeof token !== 'string') throw TypeError(token + ' is not an string')
-
-        if (!token.trim().length) throw Error ('token is empty')
-
-        return users.retrieve(id) 
-            .then(user => {
-                jwt.verify(token, SECRET, (error, decoded) => {
-                    if (error) throw Error(error.message)
-
-                    if (decoded.id !== id) throw Error(`user with id ${id} doesn't match with token ${token}`)
-
-                    return user
-                })
-            })
-            .then(({ name, surname, email}) => ({
+    retrieveUser(userId, token) {
+        return userApi.retrieve(userId, token)
+            .then(({ id, name, surname, username: email, favoriteArtists = [], favoriteAlbums = [], favoriteTracks = [] }) => ({
+                id,
                 name,
                 surname,
-                email
+                email,
+                favoriteArtists,
+                favoriteAlbums,
+                favoriteTracks
             }))
-        
-        // return userApi.retrieve(userId, token)
-        //     .then(({ id, name, surname, username: email, favoriteArtists = [], favoriteAlbums = [], favoriteTracks = [] }) => ({
-        //         id,
-        //         name,
-        //         surname,
-        //         email,
-        //         favoriteArtists,
-        //         favoriteAlbums,
-        //         favoriteTracks
-        //     }))
     },
 
     // TODO updateUser and removeUser
-
-    updateUser(id, token, updates) {
-        if (typeof id !== 'string') throw TypeError(id + ' is not an string')
-
-        if (!id.trim().length) throw Error ('id is empty')
-
-        if (typeof token !== 'string') throw TypeError(token + ' is not an string')
-
-        if (!token.trim().length) throw Error ('token is empty')
-
-        if (constructor.updates !== Object) throw TypeError(updates + ' is not an object')
-
-        if (typeof token !== 'string') throw TypeError(token + ' is not an string')
-
-        if (!token.trim().length) throw Error ('token is empty')
-
-        return users.update(user, updates)
-            .then(res => res)
-    },
-
-    removeUser(id, token) {
-        if (typeof id !== 'string') throw TypeError(id + ' is not an string')
-
-        if (!id.trim().length) throw Error ('id is empty')
-
-        if (typeof token !== 'string') throw TypeError(token + ' is not an string')
-
-        if (!token.trim().length) throw Error ('token is empty')
-
-        return users.remove(user)
-            .then(res => res)
-    },
 
     /**
      * Search artists.
@@ -180,12 +101,6 @@ const logic = {
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return spotifyApi.retrieveArtist(artistId)
-        // TODO once artistComment is already implemented
-        // .then(artist =>
-        //     artistComment.find({ artistId: artist.id })
-        //         .then(comments => artist.comments = comments)
-        //         .then(() => artist)
-        // )
     },
 
     /**
@@ -205,47 +120,6 @@ const logic = {
 
                 return userApi.update(userId, token, { favoriteArtists })
             })
-    },
-
-    addCommentToArtist(userId, token, artistId, text) {
-        if (typeof userId !== 'string') throw TypeError(userId + ' is not an string')
-
-        if (!userId.trim().length) throw Error ('userId is empty')
-
-        if (typeof token !== 'string') throw TypeError(token + ' is not an string')
-
-        if (!token.trim().length) throw Error ('token is empty')
-
-        if (typeof artistId !== 'string') throw TypeError(artistId + ' is not an string')
-
-        if (!artistId.trim().length) throw Error ('artistId is empty')
-
-        if (typeof text !== 'string') throw TypeError(text + ' is not an string')
-
-        if (!text.trim().length) throw Error ('text is empty')
-
-        const comment = {
-            userId,
-            artistId,
-            text,
-            date: new Date
-        }
-
-        return userApi.retrieve(userId, token)
-            .then(() => spotifyApi.retrieveArtist(artistId))
-            .then(({ error }) => {
-                if (error) throw Error(error.message)
-            })
-            .then(() => artistComments.add(comment))
-            .then(() => comment.id)
-    },
-
-    listCommentsFromArtist(artistId) {
-        if (typeof artistId !== 'string') throw TypeError(artistId + ' is not an string')
-
-        if (!artistId.trim().length) throw Error ('artistId is empty')
-
-        return artistComments.find({ artistId })
     },
 
     /**
@@ -336,6 +210,42 @@ const logic = {
 
                 return userApi.update(userId, token, { favoriteTracks })
             })
+    },
+
+    addCommentToArtist(userId, token, artistId, text) {
+        if (typeof userId !== 'string') throw Error(`${userId} is not a string`)
+
+        if (!userId.trim().length) throw Error('userId is empty')
+
+        if (typeof token !== 'string') throw Error(`${token} is not a string`)
+
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        if (typeof text !== 'string') throw Error(`${text} is not a string`)
+
+        if (!text.trim().length) throw Error('text is empty')
+
+        const comment = {
+            userId,
+            artistId,
+            text
+        }
+
+        return userApi.retrieve(userId, token)
+            .then(() => artistComment.add(comment))
+            .then(() => comment.id)
+    },
+
+    listCommentsFromArtist(artistId) {
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        return artistComment.find({ artistId })
     }
 }
 

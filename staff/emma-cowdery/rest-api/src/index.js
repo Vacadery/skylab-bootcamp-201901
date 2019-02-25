@@ -2,32 +2,47 @@ require('dotenv').config()
 
 require('isomorphic-fetch')
 
+const { MongoClient } = require('mongodb')
 const express = require('express')
 const bodyParser = require('body-parser')
-const router = express('router')
+const spotifyApi = require('./spotify-api')
 
-const { register, authenticate, retrieve, notFound, addCommentToArtist, listCommentsFromArtist } = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentToArtist, listCommentsFromArtist, notFound } = require('./routes')
 
-const { env: { PORT }, argv: [, , port = PORT || 8080] } = process
+const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN }, argv: [, , port = PORT || 8080] } = process
 
-const app = express()
+MongoClient.connect(DB_URL, { useNewUrlParser: true })
+    .then(client => {
+        spotifyApi.token = SPOTIFY_API_TOKEN
 
-const jsonBodyParser = bodyParser.json()
+        const app = express()
 
-app.post('/register', jsonBodyParser, register.post)
+        const jsonBodyParser = bodyParser.json()
 
-app.post('/authenticate', jsonBodyParser, authenticate.post)
+        const router = express.Router()
 
-app.get('/retrieve/:userId', retrieve.get)
+        router.post('/user', jsonBodyParser, registerUser)
 
-// TODO add comment to artist
-router.post('/artist/:artistId/comment', jsonBodyParser, addCommentToArtist)
+        router.post('/user/auth', jsonBodyParser, authenticateUser)
 
-// TODO list comments from artist
-router.get('/artist/:artistId/comment', listCommentsFromArtist)
+        router.get('/user/:id', retrieveUser)
 
-// app.get('*', notFound.get)
+        router.get('/artists', searchArtists)
 
-app.get('/search-artists', searchArtists.get)
+        router.post('/artist/:artistId/comment', jsonBodyParser, addCommentToArtist)
 
-app.listen(port, () => console.log(`server running on port ${port}`))
+        router.get('/artist/:artistId/comment', listCommentsFromArtist)
+
+        // router.get('/artist/:id', retrieveArtist)
+
+        // router.get('/album/:id', retrieveAlbum)
+
+        // router.get('/track/:id', retrieveTrack)
+
+        // app.get('*', notFound)
+
+        app.use('/api', router)
+
+        app.listen(port, () => console.log(`server running on port ${port}`))
+    })
+    .catch(console.error)
