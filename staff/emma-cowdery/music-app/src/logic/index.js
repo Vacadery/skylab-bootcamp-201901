@@ -137,6 +137,10 @@ const logic = {
         return musicApi.retrieveArtist(artistId)
     },
 
+    // toggleFavouriteArtist(artistId) {
+    //     return musicApi.toggleFavouriteArtist
+    // },
+
     /**
      * Retrieves albums from artists
      * 
@@ -149,7 +153,7 @@ const logic = {
 
         //if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
 
-        return spotifyApi.retrieveAlbums(artistId)
+        return musicApi.retrieveAlbums(artistId)
     },
 
     /**

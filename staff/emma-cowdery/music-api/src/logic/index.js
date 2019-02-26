@@ -92,8 +92,13 @@ const logic = {
     },
 
     retrieveUser(userId, token) {
-        // TODO validate userId and token type and content
+        if (typeof uderId !== 'string') throw TypeError(uderId + ' is not a string')
 
+        if (!uderId.trim().length) throw Error('uderId cannot be empty')
+
+        if (typeof token !== 'string') throw TypeError(token + ' is not a string')
+
+        if (!token.trim().length) throw Error('token cannot be empty')
         this.__verifyUserToken__(userId, token)
 
         return users.findById(userId)
@@ -161,7 +166,17 @@ const logic = {
     },
 
     addCommentToArtist(userId, token, artistId, text) {
-        // TODO validate userId, token, artistId and text
+        if (typeof userId !== 'string') throw Error(`${userId} is not a string`)
+        if (!userId.trim().length) throw Error('userId is empty')
+
+        if (typeof token !== 'string') throw Error(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+        if (!artistId.trim().length) throw Error('artistId is empty')
+
+        if (typeof text !== 'string') throw Error(`${text} is not a string`)
+        if (!text.trim().length) throw Error('text is empty')
 
         this.__verifyUserToken__(userId, token)
 
@@ -181,7 +196,9 @@ const logic = {
     },
 
     listCommentsFromArtist(artistId) {
-        // TODO validate artistId
+        if (typeof artistId !== 'string') throw Error(`${artistId} is not a string`)
+
+        if (!artistId.trim().length) throw Error('artistId is empty')
 
         return artistComments.find({ artistId })
     },

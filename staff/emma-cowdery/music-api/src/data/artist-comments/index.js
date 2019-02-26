@@ -30,7 +30,7 @@ const artistComment = {
     },
 
     add(comment) {
-        // TODO validate comment (should all field values and types)
+        if(comment.constructor !== Object) throw Error(comment + ' is not an object')
 
         const file = path.join(__dirname, this.file)
 
@@ -45,7 +45,8 @@ const artistComment = {
     },
 
     retrieve(id) {
-        // TODO validate id
+        if(typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if(!id.trim().length) throw Error ('id is empty')
 
         const file = path.join(__dirname, this.file)
 
@@ -62,7 +63,7 @@ const artistComment = {
     },
 
     update(comment) {
-        // TODO validate comment (should all field values and types)
+        if(comment.constructor !== Object) throw Error(comment + ' is not an object')
 
         const file = path.join(__dirname, this.file)
 
@@ -79,7 +80,8 @@ const artistComment = {
     },
 
     remove(id) {
-        // TODO validate id
+        if(typeof id !== 'string') throw TypeError(`${id} is not a string`)
+        if(!id.trim().length) throw Error ('id is empty')
 
         const file = path.join(__dirname, this.file)
 
