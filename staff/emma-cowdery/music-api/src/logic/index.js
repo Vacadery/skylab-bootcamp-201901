@@ -1,6 +1,7 @@
 'use strict'
 
 const spotifyApi = require('../spotify-api')
+const { User, Comment } = require('../models')
 const users = require('../data/users')
 const artistComments = require('../data/artist-comments')
 const jwt = require('jsonwebtoken')
@@ -44,13 +45,25 @@ const logic = {
 
         if (password !== passwordConfirmation) throw Error('passwords do not match')
 
-        return users.findByEmail(email)
-            .then(user => {
-                if (user) throw Error(`user with email ${email} already exists`)
+        return (async () => {
+            const user = await User.findOne({ email })
 
-                return bcrypt.hash(password, 10)
-            })
-            .then(hash => users.add({ name, surname, email, password: hash }))
+            if (user) throw Error(`user with email ${email} already exists`)
+
+            const hash = await bcrypt.hash(password, 10)
+
+            const { id } = await User.create({ name, surname, email, password: hash })
+
+            return id
+        })
+
+        // return users.findByEmail(email)
+        //     .then(user => {
+        //         if (user) throw Error(`user with email ${email} already exists`)
+
+        //         return bcrypt.hash(password, 10)
+        //     })
+        //     .then(hash => users.add({ name, surname, email, password: hash }))
     },
 
     /**
@@ -68,21 +81,37 @@ const logic = {
 
         if (!password.trim().length) throw Error('password cannot be empty')
 
-        return users.findByEmail(email)
-            .then(user => {
-                if (!user) throw Error(`user with email ${email} not found`)
+        return (async () => {
+            const user = await User.findOne({ email })
 
-                return bcrypt.compare(password, user.password)
-                    .then(match => {
-                        if (!match) throw Error('wrong credentials')
+            if (!user) throw Error (`user with email ${email} not fould`)
 
-                        const { id } = user
+            const match = await bcrypt.compare(password, user.password)
 
-                        const token = jwt.sign({ sub: id }, this.jwtSecret, { expiresIn: '4h' })
+            if (!match) throw Error('wrong credentials')
 
-                        return { id, token }
-                    })
-            })
+            const { id } = user
+
+            const token = jwt.sign({ sub: id }, this.jwtSecret, { expiresIn: '4h' })
+
+            return { id, token }
+        })
+
+        // return users.findByEmail(email)
+        //     .then(user => {
+        //         if (!user) throw Error(`user with email ${email} not found`)
+
+        //         return bcrypt.compare(password, user.password)
+        //             .then(match => {
+        //                 if (!match) throw Error('wrong credentials')
+
+        //                 const { id } = user
+
+        //                 const token = jwt.sign({ sub: id }, this.jwtSecret, { expiresIn: '4h' })
+
+        //                 return { id, token }
+        //             })
+        //     })
     },
 
     __verifyUserToken__(userId, token) {
@@ -101,14 +130,24 @@ const logic = {
         if (!token.trim().length) throw Error('token cannot be empty')
         this.__verifyUserToken__(userId, token)
 
-        return users.findById(userId)
-            .then(user => {
-                if (!user) throw Error(`user with id ${id} not found`)
+        return (async () => {
+            const user = await User.findById(userId)
 
-                delete user.password
+            if (!user) throw Error(`user with id ${userId} not found`)
 
-                return user
-            })
+            delete user.password
+
+            return user
+        })
+
+        // return users.findById(userId)
+        //     .then(user => {
+        //         if (!user) throw Error(`user with id ${id} not found`)
+
+        //         delete user.password
+
+        //         return user
+        //     })
     },
 
     // TODO updateUser and removeUser
@@ -150,19 +189,34 @@ const logic = {
 
         this.__verifyUserToken__(userId, token)
 
-        return users.findById(userId)
-            .then(user => {
-                const { favoriteArtists = [] } = user
+        return (async () => {
+            const user = await User.findById(userId)
 
-                const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
+            const { favoriteArtists = [] } = user
 
-                if (index < 0) favoriteArtists.push(artistId)
-                else favoriteArtists.splice(index, 1)
+            const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
 
-                user.favoriteArtists = favoriteArtists
+            if (index < 0) favoriteArtists.push(artistId)
+            else favoriteArtists.splice(index, 1)
 
-                return users.update(user)
-            })
+            user.favoriteArtists = favoriteArtists
+
+            return User.save(user)
+        })
+
+        // return users.findById(userId)
+        //     .then(user => {
+        //         const { favoriteArtists = [] } = user
+
+        //         const index = favoriteArtists.findIndex(_artistId => _artistId === artistId)
+
+        //         if (index < 0) favoriteArtists.push(artistId)
+        //         else favoriteArtists.splice(index, 1)
+
+        //         user.favoriteArtists = favoriteArtists
+
+        //         return users.update(user)
+        //     })
     },
 
     addCommentToArtist(userId, token, artistId, text) {
@@ -191,7 +245,7 @@ const logic = {
             .then(({ error }) => {
                 if (error) throw Error(error.message)
             })
-            .then(() => artistComments.add(comment))
+            .then(() => Comment.save(comment))
             .then(() => comment.id)
     },
 
@@ -200,7 +254,9 @@ const logic = {
 
         if (!artistId.trim().length) throw Error('artistId is empty')
 
-        return artistComments.find({ artistId })
+        return Comment.findOne({ id: artistId})
+
+        // return artistComments.find({ artistId })
     },
 
     /**
@@ -239,19 +295,34 @@ const logic = {
 
         this.__verifyUserToken__(userId, token)
 
-        return users.findById(userId)
-            .then(user => {
-                const { favoriteAlbums = [] } = user
+        return (async () => {
+            const user = await User.findById(userId)
 
-                const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
+            const { favoriteAlbums = [] } = user
 
-                if (index < 0) favoriteAlbums.push(albumId)
-                else favoriteAlbums.splice(index, 1)
+            const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
 
-                user.favoriteAlbums = favoriteAlbums
+            if (index < 0) favoriteAlbums.push(albumId)
+            else favoriteAlbums.splice(index, 1)
 
-                return users.update(user)
-            })
+            user.favoriteAlbums = favoriteAlbums
+
+            return User.save(user)
+        })
+
+        // return users.findById(userId)
+        //     .then(user => {
+        //         const { favoriteAlbums = [] } = user
+
+        //         const index = favoriteAlbums.findIndex(_albumId => _albumId === albumId)
+
+        //         if (index < 0) favoriteAlbums.push(albumId)
+        //         else favoriteAlbums.splice(index, 1)
+
+        //         user.favoriteAlbums = favoriteAlbums
+
+        //         return users.update(user)
+        //     })
     },
 
     /**
@@ -290,19 +361,34 @@ const logic = {
 
         this.__verifyUserToken__(userId, token)
 
-        return users.findById(userId)
-            .then(user => {
-                const { favoriteTracks = [] } = user
+        return (async () => {
+            const user = await User.findById(userId)
 
-                const index = favoriteTracks.findIndex(_trackId => _trackId === trackId)
+            const { favoriteTracks = [] } = user
 
-                if (index < 0) favoriteTracks.push(trackId)
-                else favoriteTracks.splice(index, 1)
+            const index = favoriteTracks.findIndex(_trackId => -_trackId === trackId)
 
-                user.favoriteTracks = favoriteTracks
+            if (index < 0) favoriteTracks.push(trackId)
+            else favoriteTracks.splice(index, 1)
 
-                return users.update(user)
-            })
+            user.favoriteTracks = favoriteTracks
+
+            return User.save(user)
+        })
+
+        // return users.findById(userId)
+        //     .then(user => {
+        //         const { favoriteTracks = [] } = user
+
+        //         const index = favoriteTracks.findIndex(_trackId => _trackId === trackId)
+
+        //         if (index < 0) favoriteTracks.push(trackId)
+        //         else favoriteTracks.splice(index, 1)
+
+        //         user.favoriteTracks = favoriteTracks
+
+        //         return users.update(user)
+        //     })
     }
 }
 

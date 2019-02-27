@@ -61,7 +61,10 @@ const musicApi = {
             },
             body: JSON.stringify({ email, password })
         })
-        .then(response => response.json())
+        .then(response => {
+            debugger
+            return response.json()
+        })
         .then(response => response)
     },
 
@@ -267,3 +270,5 @@ const musicApi = {
             .then(response => response.json())
     }
 }
+
+export default musicApi

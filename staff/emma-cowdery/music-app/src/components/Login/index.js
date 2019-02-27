@@ -11,6 +11,8 @@ class Login extends Component {
     handleFormSubmit = event => {
         event.preventDefault()
 
+        debugger
+
         const { state: { email, password }, props: { onLogin } } = this
 
         onLogin(email, password)

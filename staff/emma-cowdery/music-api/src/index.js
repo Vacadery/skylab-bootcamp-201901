@@ -2,6 +2,7 @@ require('dotenv').config()
 
 require('isomorphic-fetch')
 
+const mongoose = require('mongoose')
 const { MongoClient } = require('mongodb')
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -14,11 +15,8 @@ const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentT
 const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, JWT_SECRET }, argv: [, , port = PORT || 8080] } = process
 
 
-MongoClient.connect(DB_URL, { useNewUrlParser: true })
-    .then(client => {
-        const db = client.db()
-        users.collection = db.collection('users')
-
+mongoose.connect(DB_URL, { useNewUrlParser: true })
+    .then(() => {
         spotifyApi.token = SPOTIFY_API_TOKEN
         logic.jwtSecret = JWT_SECRET
 
@@ -27,6 +25,13 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
         const jsonBodyParser = bodyParser.json()
 
         const router = express.Router()
+
+        function cors(req, res, next) {
+            res.set('access-control-allow-headers', 'Accept, Authorization, Origin, Content-Type, Retry-After')
+            res.set('access-control-allow-origin', '*')
+        }
+
+        router.use(cors)
 
         router.post('/user', jsonBodyParser, registerUser)
 
@@ -53,3 +58,12 @@ MongoClient.connect(DB_URL, { useNewUrlParser: true })
         app.listen(port, () => console.log(`server running on port ${port}`))
     })
     .catch(console.error)
+
+process.on('SIGINT', () => {
+    mongoose.disconnect()
+        .then(() => {
+            console.log('\nserver stopped')
+
+            process.exit(0)
+        })
+})
