@@ -54,7 +54,7 @@ const musicApi = {
         if (typeof password !== 'string') throw TypeError(`${password} is not a string`)
         if (!password.trim().length) throw Error('password is empty')
 
-        return fetch(`${this.url}/auth`, {
+        return fetch(`${this.url}/user/auth`, {
             method: 'POST',
             headers: {
                 'content-type': 'application/json'
@@ -62,10 +62,10 @@ const musicApi = {
             body: JSON.stringify({ email, password })
         })
         .then(response => {
-            debugger
             return response.json()
         })
         .then(response => response)
+        .catch(console.error)
     },
 
     /**

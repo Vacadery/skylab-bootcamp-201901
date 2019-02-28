@@ -55,7 +55,7 @@ const logic = {
             const { id } = await User.create({ name, surname, email, password: hash })
 
             return id
-        })
+        })()
 
         // return users.findByEmail(email)
         //     .then(user => {
@@ -94,8 +94,10 @@ const logic = {
 
             const token = jwt.sign({ sub: id }, this.jwtSecret, { expiresIn: '4h' })
 
+            console.log(id, token)
+
             return { id, token }
-        })
+        })()
 
         // return users.findByEmail(email)
         //     .then(user => {
@@ -138,7 +140,7 @@ const logic = {
             delete user.password
 
             return user
-        })
+        })()
 
         // return users.findById(userId)
         //     .then(user => {
@@ -202,7 +204,7 @@ const logic = {
             user.favoriteArtists = favoriteArtists
 
             return User.save(user)
-        })
+        })()
 
         // return users.findById(userId)
         //     .then(user => {
@@ -308,7 +310,7 @@ const logic = {
             user.favoriteAlbums = favoriteAlbums
 
             return User.save(user)
-        })
+        })()
 
         // return users.findById(userId)
         //     .then(user => {
@@ -374,7 +376,7 @@ const logic = {
             user.favoriteTracks = favoriteTracks
 
             return User.save(user)
-        })
+        })()
 
         // return users.findById(userId)
         //     .then(user => {

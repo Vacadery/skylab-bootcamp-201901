@@ -9,14 +9,17 @@ import Albums from '../Albums'
 import Tracks from '../Tracks'
 
 class App extends Component {
-    state = { user: null, artists: [], albums: [], tracks: [], track: {}, image: '', loginFeedback: '', name: '', welcomeVisual: false, registerVisual: false, loginVisual: true, artistsVisual: false, albumsVisual: false, tracksVisual: false, trackVisual: false}
+    state = { id: null, token: null, artists: [], albums: [], tracks: [], track: {}, image: '', loginFeedback: '', name: '', welcomeVisual: false, registerVisual: false, loginVisual: true, artistsVisual: false, albumsVisual: false, tracksVisual: false, trackVisual: false}
 
     handleLogin = (email, password) => {
         try {
-            logic.login(email, password, user => {
-    
-                this.setState({ user, loginFeedback: '', welcomeVisual: true, loginVisual: false, name: user.name })
-            })
+            logic.login(email, password)
+                .then((token) => {
+                    //if (!id) throw Error('id not found')
+                    if (!token) throw Error('token not found')
+
+                    this.setState({ token, loginFeedback: '', welcomeVisual: true, loginVisual: false, name: 'e' })
+                })
         } catch ({ message }) {
             this.setState({ loginFeedback: message })           
         }
@@ -24,11 +27,11 @@ class App extends Component {
 
     handleRegister = (name, surname, email, password, passwordConfirmation) => {
         try {
-
-            logic.register(name, surname, email, password, passwordConfirmation, () => {
-
-                this.setState({ registerFeedback: '', registerVisual: false, loginVisual: true })
-            })
+            logic.register(name, surname, email, password, passwordConfirmation)
+                .then(() => {
+                    this.setState({ registerFeedback: '', registerVisual: false, loginVisual: true })
+                })         
+        
         } catch ({ message }) {
             //console.error(error)
             // this.setState({ loginFeedback: message })

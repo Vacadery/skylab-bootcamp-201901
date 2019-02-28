@@ -18,21 +18,23 @@ const logic = {
      * @param {function} callback 
      */
     login: function (email, password) {
-        // TODO validate fields!
+        if (typeof email !== 'string') throw TypeError(`${email} is not a string`)
+        if (!email.trim().length) throw Error('email cannot be empty')
 
-        var user = users.find(function (user) {
-            return user.email === email;
-        });
-
-        if (!user) throw Error('user ' + email + ' not found');
-
-        if (user.password !== password) throw Error('wrong password');
+        if (typeof password !== 'string') throw TypeError(`${password} is not a string`)
+        if (!password.trim().length) throw Error('password cannot be empty')
 
         return musicApi.authenticateUser(email, password)
             .then(({ id, token}) => {
                 this.__userId__ = id
                 this.__userApiToken__ = token
+
+                console.log(id)
+                console.log(token)
+
+                //return (id, token)
             })
+            .then((token) => ({token}))
     },
 
     /**
