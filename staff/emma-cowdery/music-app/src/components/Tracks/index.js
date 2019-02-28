@@ -19,20 +19,17 @@ class Tracks extends Component {
         this.props.toArtists()
     }
 
-    handleTracksId = (id) => {
-        this.props.handleTracksId(id)
+    handleTracksId = (trackId) => {
+        this.props.handleTracksId(trackId)
 
         this.setState({ trackVisual: true })
     }
 
     handleAddFavourite = (trackId) => {
-        console.log('sfss')
         try {
             logic.favouritedSongs(this.props.user.email, trackId, (favourited) => {
                 debugger
                 this.setState(favourited)
-                //console.log(favourited)
-                console.log('dffd')
             })
         } catch(err) {
             console.error(err)

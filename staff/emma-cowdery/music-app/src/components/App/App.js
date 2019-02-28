@@ -9,12 +9,13 @@ import Albums from '../Albums'
 import Tracks from '../Tracks'
 
 class App extends Component {
-    state = { id: null, token: null, artists: [], albums: [], tracks: [], track: {}, image: '', loginFeedback: '', name: '', welcomeVisual: false, registerVisual: false, loginVisual: true, artistsVisual: false, albumsVisual: false, tracksVisual: false, trackVisual: false}
+    state = { id: null, token: null, artists: [], albums: [], items: [], track: {}, image: '', loginFeedback: '', name: '', welcomeVisual: false, registerVisual: false, loginVisual: true, artistsVisual: false, albumsVisual: false, tracksVisual: false, trackVisual: false}
 
     handleLogin = (email, password) => {
         try {
             logic.login(email, password)
-                .then((token) => {
+                .then(token => {
+                    console.log(token)
                     //if (!id) throw Error('id not found')
                     if (!token) throw Error('token not found')
 
@@ -63,17 +64,15 @@ class App extends Component {
     handleToTracks = (id, image) => {
         try {
             logic.retrieveTracks(id)
-                .then(tracks => {
-                    this.setState({ tracks, registerFeedback: '', albumsVisual: false, tracksVisual: true, image })
-                })   
+                .then(({items}) => this.setState({ items, registerFeedback: '', albumsVisual: false, tracksVisual: true, image }))   
         } catch ({ message }) {
             this.setState({ registerFeedback: message })
         }
     }
 
-    handleToTrack = (id) => {
+    handleToTrack = (trackId) => {
         try {
-            logic.retrieveTrack(id)
+            logic.retrieveTrack(trackId)
                 .then(track => {
                     this.setState({ track, registerFeedback: '', trackVisual: true })
                 })  
@@ -134,7 +133,7 @@ class App extends Component {
             {registerVisual && <Register onRegister={handleRegister} backToLogin={this.handleToLogin} />}
             {artistsVisual && <Artist handleArtistId={handleToAlbums} artistsList={this.state.artists} />}
             {albumsVisual && <Albums albumsList={this.state.albums} handleAlbumId={handleToTracks} toArtists={handleButtonToArtists} />}
-            {tracksVisual && <Tracks tracksList={this.state.tracks} albumCover={this.state.image} handleTracksId={handleToTrack} toArtists={handleButtonToArtists} toAlbums={handleButtonToAlbums} track={this.state.track} onAddFavourite={this.handleFavourited} userEmail={this.state.user.email}/>}
+            {tracksVisual && <Tracks tracksList={this.state.items} albumCover={this.state.image} handleTracksId={handleToTrack} toArtists={handleButtonToArtists} toAlbums={handleButtonToAlbums} track={this.state.track} onAddFavourite={this.handleFavourited}/>}
         </main>
     }
 }

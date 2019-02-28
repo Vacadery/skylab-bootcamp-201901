@@ -125,7 +125,11 @@ const spotifyApi = {
             }
         })
             .then(response => response.json())
-            .then(({ items }) => items)
+            // .then(({ items }) => {
+            //     console.log('noo')
+            //     console.log(items)
+            //     return items
+            // })
     },
 
     /**

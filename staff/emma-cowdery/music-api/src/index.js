@@ -9,8 +9,14 @@ const bodyParser = require('body-parser')
 const spotifyApi = require('./spotify-api')
 const users = require('./data/users')
 const logic = require('./logic')
+var cors = require('cors')
+var corsOptions = {
+    origin: 'http://localhost:3000'
+}
 
-const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentToArtist, listCommentsFromArtist, notFound } = require('./routes')
+
+
+const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentToArtist, listCommentsFromArtist, notFound, retrieveAlbums, retrieveTracks, retrieveTrack } = require('./routes')
 
 const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, JWT_SECRET }, argv: [, , port = PORT || 8080] } = process
 
@@ -26,14 +32,18 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
 
         const router = express.Router()
 
-        function cors(req, res, next) {
-            res.set('access-control-allow-headers', 'Accept, Authorization, Origin, Content-Type, Retry-After')
-            res.set('access-control-allow-origin', '*')
-            next()
-        }
-        console.log('fngjfn')
+        app.use(cors())
 
-        router.use(cors)
+        // function cors(req, res, next) {
+        //     res.set('access-control-allow-credentials', true)
+        //     res.set('access-control-allow-headers', 'Accept, Authorization, Origin, Content-Type, Retry-After')
+        //     res.set('access-control-allow-methods', 'GET, POST, OPTIONS, PUT, DELETE, PATCH')
+        //     res.set('access-control-allow-origin', '*')
+        //     res.set('access-control-max-age', 604800)
+        //     next()
+        // }
+
+        //router.use(cors)
 
         router.post('/user', jsonBodyParser, registerUser)
 
@@ -41,19 +51,25 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
 
         router.get('/user/:id', retrieveUser)
 
-        router.get('/artists', searchArtists)
+        router.get('/artists',searchArtists)
 
         router.post('/artist/:artistId/comment', jsonBodyParser, addCommentToArtist)
 
         router.get('/artist/:artistId/comment', listCommentsFromArtist)
 
-        // router.get('/artist/:id', retrieveArtist)
+        router.get('/albums/:artistId', retrieveAlbums)
 
-        // router.get('/album/:id', retrieveAlbum)
+        router.get('/tracks/:albumId', retrieveTracks)
+
+        router.get('/track/:trackId', retrieveTrack)
+
+        //router.post('/artist/:id', retrieveArtist)
+
+        //router.get('/album/:id', retrieveAlbum)
 
         // router.get('/track/:id', retrieveTrack)
 
-        app.get('*', notFound)
+        router.get('*', notFound)
 
         app.use('/api', router)
 

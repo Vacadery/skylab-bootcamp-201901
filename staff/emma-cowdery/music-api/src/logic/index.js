@@ -94,7 +94,7 @@ const logic = {
 
             const token = jwt.sign({ sub: id }, this.jwtSecret, { expiresIn: '4h' })
 
-            console.log(id, token)
+            //console.log(id, token)
 
             return { id, token }
         })()

@@ -168,11 +168,16 @@ const musicApi = {
         if (typeof query !== 'string') throw TypeError(`${query} is not a string`)
         if (!query.trim().length) throw Error('query is empty')
 
-        return fetch (`${this.url}/artists?q=${query}`)
+        return fetch (`${this.url}/artists?q=${query}`, {
+            method: 'GET',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
             .then(response => response.json())
             .then(response => {
                 if (response.error) throw Error(response.error)
-
+                //console.log(response)
                 return response
             })
     },
@@ -186,7 +191,10 @@ const musicApi = {
         if (!artistId.trim().length) throw Error('artistId is empty')
 
         return fetch(`${this.url}/artists/${artistId}`)
-            .then(response => response.json())
+            .then(response => {
+                console.log(response)
+                return response.json()
+            })
     },
 
     /**
@@ -232,9 +240,13 @@ const musicApi = {
         if (typeof artistId !== 'string') throw TypeError(`${artistId} is not a string`)
         if (!artistId.trim().length) throw Error('artistId is empty')
 
-        return fetch(`${this.url}/artists/${artistId}/albums`)
+        return fetch(`${this.url}/albums/${artistId}`)
             .then(response => response.json())
-            .then(({ items }) => items)
+            .then(response => {
+                if (response.error) throw Error(response.error)
+                
+                return response
+            })
     },
 
     /**
@@ -257,17 +269,28 @@ const musicApi = {
         if (typeof albumId !== 'string') throw TypeError(`${albumId} is not a string`)
         if (!albumId.trim().length) throw Error('albumId is empty')
 
-        return fetch(`${this.url}/albums/${albumId}/tracks`)
+        return fetch(`${this.url}/tracks/${albumId}`)
             .then(response => response.json())
-            .then(({ items }) => items)
+            .then(response => {
+                if (response.error) throw Error(response.error)
+                console.log('in music api')
+                console.log(response)
+                return response
+            })
+            // .then(({ items }) => items)
     },
 
     retrieveTrack(trackId) {
         if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
         if (!trackId.trim().length) throw Error('trackId is empty')
 
-        return fetch(`${this.url}/tracks/${trackId}`)
+        return fetch(`${this.url}/track/${trackId}`)
             .then(response => response.json())
+            .then(response => {
+                if (response.error) throw Error(response.error)
+                console.log(response)
+                return response
+            })
     }
 }
 

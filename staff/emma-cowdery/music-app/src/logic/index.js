@@ -29,10 +29,7 @@ const logic = {
                 this.__userId__ = id
                 this.__userApiToken__ = token
 
-                console.log(id)
-                console.log(token)
-
-                //return (id, token)
+                return (id, token)
             })
             .then((token) => ({token}))
     },
@@ -170,7 +167,7 @@ const logic = {
 
         //if (typeof callback !== 'function') throw TypeError(`${callback} is not a function`)
 
-        return spotifyApi.retrieveTracks(albumId)
+        return musicApi.retrieveTracks(albumId)
     },
 
     /**
@@ -178,14 +175,14 @@ const logic = {
      * @param {string} id 
      * @param {function} callback 
      */
-    retrieveTrack(id) {
-        if (typeof id !== 'string') throw TypeError(`${id} is not a string`)
+    retrieveTrack(trackId) {
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
 
-        if(!id.trim().length) throw Error('id is empty')
+        if(!trackId.trim().length) throw Error('track id is empty')
 
         //if (typeof callback !== 'function') throw TypeError(`${callback} is not a finction`)
 
-        return spotifyApi.retrieveTrack(id)
+        return musicApi.retrieveTrack(trackId)
     },
 
     /**
