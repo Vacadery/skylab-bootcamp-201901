@@ -5,7 +5,7 @@ import logic from '../../logic';
 
 
 class Tracks extends Component {
-    state = { id: '', track: null, trackVisual: false, userFavourites: null}
+    state = { id: '', track: null, fav: false, trackVisual: false, userFavourites: null}
 
     handleToAlbums = event => {
         event.preventDefault()
@@ -27,10 +27,8 @@ class Tracks extends Component {
 
     handleAddFavourite = (trackId) => {
         try {
-            logic.favouritedSongs(this.props.user.email, trackId, (favourited) => {
-                debugger
-                this.setState(favourited)
-            })
+            logic.addFavouriteTrack(trackId)
+                .then()
         } catch(err) {
             console.error(err)
         }
@@ -67,7 +65,7 @@ class Tracks extends Component {
                 }
             </div>
             <footer>
-                {trackVisual && <Track track={this.props.track} onAddFavorite={handleAddFavourite} userFavourites={favourited}/>}
+                {trackVisual && <Track track={this.props.track} fav={this.props.fav} onAddFavorite={handleAddFavourite} userFavourites={favourited}/>}
             </footer>
         </section>
     }

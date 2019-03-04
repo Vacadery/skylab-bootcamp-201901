@@ -177,7 +177,7 @@ const musicApi = {
             .then(response => response.json())
             .then(response => {
                 if (response.error) throw Error(response.error)
-                //console.log(response)
+     
                 return response
             })
     },
@@ -192,7 +192,6 @@ const musicApi = {
 
         return fetch(`${this.url}/artists/${artistId}`)
             .then(response => {
-                console.log(response)
                 return response.json()
             })
     },
@@ -273,8 +272,7 @@ const musicApi = {
             .then(response => response.json())
             .then(response => {
                 if (response.error) throw Error(response.error)
-                console.log('in music api')
-                console.log(response)
+              
                 return response
             })
             // .then(({ items }) => items)
@@ -288,9 +286,35 @@ const musicApi = {
             .then(response => response.json())
             .then(response => {
                 if (response.error) throw Error(response.error)
-                console.log(response)
+
                 return response
             })
+    },
+
+    addFavouriteTrack(userId, token, trackId) {
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
+        if (!trackId.trim().length) throw Error('trackId is empty')
+
+        if (typeof token !== 'string') throw TypeError(`${token} is not a string`)
+        if (!token.trim().length) throw Error('token is empty')
+
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
+        if (!trackId.trim().length) throw Error('trackId is empty')
+
+
+        return fetch(`${this.url}/track/${trackId}`, {
+            method: 'POST',
+            headers: {
+                authorization: `Bearer ${token}`
+            },
+            body: JSON.stringify({ userId })
+        })
+        .then(response => response.json())
+        .then(response => {
+            if (response.error) throw Error(response.error)
+            //console.log(response)
+            return response
+        })
     }
 }
 

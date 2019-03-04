@@ -207,6 +207,18 @@ const logic = {
             return callback(user.favourites)
         })
 
+    },
+
+    addFavouriteTrack(trackId) {
+        if (typeof trackId !== 'string') throw TypeError(`${trackId} is not a string`)
+
+        if(!trackId.trim().length) throw Error('track id is empty')
+
+        return musicApi.addFavouriteTrack(this.__userId__, this.__userApiToken__, trackId)
+            .then(response => {
+                console.log(response)
+                return response
+            })
     }
 }
 

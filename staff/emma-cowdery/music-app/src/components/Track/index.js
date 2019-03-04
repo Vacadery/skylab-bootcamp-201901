@@ -10,10 +10,12 @@ function Track({ track, onAddFavourite, userFavourites }) {
                 <audio controls autoPlay loop className="audio" src={track.preview_url}></audio>
             </div>
         </div>
-        {/* <div className="navbar-end">
-            <button className={userFavourites.includes(track.id) ? `navbar-item button is-danger far fa-heart` : `navbar-item button is-light far fa-heart` } onClick={() => onAddFavourite(track.id)}></button>
-        </div> */}
+        <div className="navbar-end">
+            <button onClick={() => onAddFavourite(track.id)}>fav</button>
+        </div>
     </nav>
 }
+
+//className={userFavourites.includes(track.id) ? `navbar-item button is-danger far fa-heart` : `navbar-item button is-light far fa-heart` 
 
 export default Track

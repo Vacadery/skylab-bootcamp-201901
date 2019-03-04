@@ -17,6 +17,8 @@ module.exports = {
 
     retrieveTrack: require('./retrieve-track'),
 
+    addFavouriteTrack: require('./add-favourite-track-to-user'),
+
     // TODO other route handlers
 
     notFound: require('./not-found')

@@ -16,7 +16,7 @@ var corsOptions = {
 
 
 
-const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentToArtist, listCommentsFromArtist, notFound, retrieveAlbums, retrieveTracks, retrieveTrack } = require('./routes')
+const { registerUser, authenticateUser, retrieveUser, searchArtists, addCommentToArtist, listCommentsFromArtist, notFound, retrieveAlbums, retrieveTracks, retrieveTrack, addFavouriteTrack } = require('./routes')
 
 const { env: { DB_URL, PORT, SPOTIFY_API_TOKEN, JWT_SECRET }, argv: [, , port = PORT || 8080] } = process
 
@@ -62,6 +62,8 @@ mongoose.connect(DB_URL, { useNewUrlParser: true })
         router.get('/tracks/:albumId', retrieveTracks)
 
         router.get('/track/:trackId', retrieveTrack)
+
+        router.post('/track/:trackId', jsonBodyParser, addFavouriteTrack)
 
         //router.post('/artist/:id', retrieveArtist)
 

@@ -366,16 +366,39 @@ const logic = {
         return (async () => {
             const user = await User.findById(userId)
 
+            console.log(user)
+
             const { favoriteTracks = [] } = user
 
             const index = favoriteTracks.findIndex(_trackId => -_trackId === trackId)
+
+            console.log(index)
 
             if (index < 0) favoriteTracks.push(trackId)
             else favoriteTracks.splice(index, 1)
 
             user.favoriteTracks = favoriteTracks
 
-            return User.save(user)
+            console.log(user.favoriteTracks)
+
+            return User.updateOne(user.favoriteTracks)
+
+            // const user = await User.findById(userId)
+
+            // //const favoriteTracks = user.favoriteTracks
+
+            // console.log(user.favoriteTracks)
+
+            // const index = favoriteTracks.findIndex(_trackId => -_trackId === trackId)
+
+            
+
+            // if (index < 0) favoriteTracks.push(trackId)
+            // else favoriteTracks.splice(index, 1)
+
+            // user.favoriteTracks = favoriteTracks
+
+            // return User.save(user)
         })()
 
         // return users.findById(userId)

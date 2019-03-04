@@ -15,9 +15,9 @@ class App extends Component {
         try {
             logic.login(email, password)
                 .then(token => {
-                    console.log(token)
+                    console.log(token.token)
                     //if (!id) throw Error('id not found')
-                    if (!token) throw Error('token not found')
+                    if (!token.token) throw TypeError('token not found')
 
                     this.setState({ token, loginFeedback: '', welcomeVisual: true, loginVisual: false, name: 'e' })
                 })
